@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+
+    <script>
+
+        // pressed = [whichKeyPressed, timePressed]
+        let pressed = [];
+        let timerIsActive = false;
+
+        document.addEventListener('keydown', function(event) {
+            // Start timer when a key is pressed for the first time
+            if (!timerIsActive)
+                // clear `pressed` array after 200ms
+                setTimeout(() => {
+                   pressed = [];
+                   timerIsActive = false;
+                }, 200);
+
+            // Store all keys pressed in the last 200ms
+            pressed.push([event.key, Date.now()]);
+
+            // Time when the first button was pressed
+            let startTime = pressed[0][1];
+            let lastPressed = 0;
+            let stats = "";
+            for (let i = 0; i < pressed.length; i++) {
+                let timeSinceStart = pressed[i][1] - startTime;
+                let timeSinceLastPressed = timeSinceStart - lastPressed;
+
+                let stat = `Key ${pressed[i][0]} pressed at time ${timeSinceStart} (${timeSinceLastPressed}ms after last press)`;
+                stats += "\n" + stat;
+                lastPressed = timeSinceStart;
+            }
+            document.getElementById("statsDiv").innerText = stats;
+
+        });
+    </script>
+</head>
+<body>
+
+<div>
+    Press some keys at the same time and I'll show you how long it took for your keyboard to send each key press.
+</div>
+<div>
+    e.g. With one finger, press:
+</div>
+<div>
+    7, u, 8 keys at the same time or
+</div>
+<div>
+    1, 2, 4, 5 keys on your numpad
+</div>
+
+<div id="statsDiv"></div>
+
+</body>
+</html>
