@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+
+
+<div id="buttons" style="display: flex; flex-direction: column;"></div>
+<script>
+    let pressed = [];
+    let pressedKeys = [];
+    let timerIsActive = false;
+    function handleInput(key) {
+       if (!timerIsActive) {
+           // clear `pressed` array after 200ms
+           setTimeout(() => {
+               pressed = [];
+               pressedKeys = [];
+               timerIsActive = false;
+           }, 200);
+       }
+       // Store all keys pressed in the last 200ms
+        pressed.push([key, Date.now()]);
+       pressedKeys.push(key);
+
+        // Time when the first button was pressed
+        let startTime = pressed[0][1];
+        let lastPressed = 0;
+        let stats = "";
+        for (let i = 0; i < pressed.length; i++) {
+            let timeSinceStart = pressed[i][1] - startTime;
+            let timeSinceLastPressed = timeSinceStart - lastPressed;
+
+            let stat = `Key ${pressed[i][0]} pressed at time ${timeSinceStart} (${timeSinceLastPressed}ms after last press)`;
+            stats += "\n" + stat;
+            lastPressed = timeSinceStart;
+        }
+        document.getElementById("statsDiv").innerText = stats;
+    }
+
+
+    window.addEventListener('gamepadconnected', (event) => {
+      const update = () => {
+        const output = document.getElementById('buttons');
+        output.innerHTML = ''; // clear the output
+        const gamepad = navigator.getGamepads()[0];
+
+          if (!gamepad) return;
+          for (const [index, button] of gamepad.buttons.entries()) {
+
+              if (button.pressed && !pressedKeys.includes(index)) {
+                  handleInput(index)
+
+              }
+
+          }
+        requestAnimationFrame(update);
+      };
+      update();
+    });
+</script>
+
+</head>
+<body>
+<div>
+    Press any button on a controller to connect.
+</div>
+<div>
+    Reload the page to try another controller.
+</div>
+
+<div>
+    Press some buttons on your controller to see how long before each keypress is registered.
+</div>
+    <div id="statsDiv"></div>
+
+</body>
+</html>
